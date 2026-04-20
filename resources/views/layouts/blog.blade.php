@@ -47,9 +47,28 @@
                         <a class="rounded-full border border-slate-200/80 px-4 py-2 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700" href="{{ route('posts.index') }}">
                             All Posts
                         </a>
-                        <a class="rounded-full bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-700" href="{{ route('posts.create') }}">
-                            Write Post
-                        </a>
+
+                        @auth
+                            <a class="rounded-full border border-slate-200/80 px-4 py-2 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700" href="{{ route('posts.create') }}">
+                                Write Post
+                            </a>
+                            <span class="px-2 text-xs font-semibold uppercase tracking-widest text-slate-400">
+                                {{ auth()->user()->name }}
+                            </span>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="rounded-full border border-rose-200 px-4 py-2 text-rose-700 transition hover:border-rose-300 hover:bg-rose-50">
+                                    Logout
+                                </button>
+                            </form>
+                        @else
+                            <a class="rounded-full border border-slate-200/80 px-4 py-2 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700" href="{{ route('login') }}">
+                                Login
+                            </a>
+                            <a class="rounded-full bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-700" href="{{ route('register') }}">
+                                Register
+                            </a>
+                        @endauth
                     </nav>
                 </div>
             </header>

@@ -16,7 +16,7 @@
             @csrf
             @method('PUT')
 
-            @include('posts._form', ['post' => $post, 'submitLabel' => 'Save Changes'])
+            @include('posts._form', ['post' => $post, 'submitLabel' => 'Save Changes', 'categories' => $categories])
         </form>
     </section>
 @endsection

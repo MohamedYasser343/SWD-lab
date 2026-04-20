@@ -15,7 +15,7 @@
         <form action="{{ route('posts.store') }}" class="space-y-8" method="POST">
             @csrf
 
-            @include('posts._form', ['submitLabel' => 'Publish Post'])
+            @include('posts._form', ['submitLabel' => 'Publish Post', 'categories' => $categories])
         </form>
     </section>
 @endsection
