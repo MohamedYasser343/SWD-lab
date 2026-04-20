@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -43,34 +44,43 @@ class PostCrudTest extends TestCase
 
     public function test_user_can_create_a_post(): void
     {
+        $user = User::factory()->create();
+
         $payload = [
             'title' => 'A calm publishing flow for Laravel teams',
             'slug' => '',
             'excerpt' => 'A short teaser for the article card.',
             'body' => 'This post explains how a small Laravel app can offer a complete and pleasant publishing workflow for a team.',
+            'status' => 'published',
         ];
 
-        $response = $this->post(route('posts.store'), $payload);
+        $response = $this->actingAs($user)->post(route('posts.store'), $payload);
         $post = Post::query()->firstOrFail();
 
         $response->assertRedirect(route('posts.show', $post));
         $this->assertDatabaseHas('posts', [
             'title' => $payload['title'],
             'slug' => 'a-calm-publishing-flow-for-laravel-teams',
+            'user_id' => $user->id,
         ]);
     }
 
     public function test_post_creation_is_validated(): void
     {
+        $user = User::factory()->create();
+
         Post::factory()->create([
             'slug' => 'existing-slug',
         ]);
 
-        $response = $this->from(route('posts.create'))->post(route('posts.store'), [
-            'title' => '',
-            'slug' => 'existing-slug',
-            'body' => 'Too short',
-        ]);
+        $response = $this->actingAs($user)
+            ->from(route('posts.create'))
+            ->post(route('posts.store'), [
+                'title' => '',
+                'slug' => 'existing-slug',
+                'body' => 'Too short',
+                'status' => 'published',
+            ]);
 
         $response->assertRedirect(route('posts.create'));
         $response->assertSessionHasErrors(['title', 'slug', 'body']);
@@ -78,13 +88,15 @@ class PostCrudTest extends TestCase
 
     public function test_user_can_update_a_post(): void
     {
-        $post = Post::factory()->create();
+        $user = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->put(route('posts.update', $post), [
+        $response = $this->actingAs($user)->put(route('posts.update', $post), [
             'title' => 'Updated newsroom notes',
             'slug' => 'updated-newsroom-notes',
             'excerpt' => 'An updated summary for the refreshed article.',
             'body' => 'The updated article body now covers the improved editing flow and explains the new blog management interface.',
+            'status' => 'published',
         ]);
 
         $post->refresh();
@@ -99,9 +111,10 @@ class PostCrudTest extends TestCase
 
     public function test_user_can_delete_a_post(): void
     {
-        $post = Post::factory()->create();
+        $user = User::factory()->create();
+        $post = Post::factory()->create(['user_id' => $user->id]);
 
-        $response = $this->delete(route('posts.destroy', $post));
+        $response = $this->actingAs($user)->delete(route('posts.destroy', $post));
 
         $response->assertRedirect(route('posts.index'));
         $this->assertModelMissing($post);

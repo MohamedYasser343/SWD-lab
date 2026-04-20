@@ -1,7 +1,13 @@
 @php
+    use App\Enums\PostStatus;
+
     $post = $post ?? null;
     $categories = $categories ?? collect();
+    $statuses = $statuses ?? PostStatus::cases();
     $currentCategory = old('category', $post?->category?->name);
+    $currentTags = old('tags', $post?->tags?->pluck('name')->implode(', '));
+    $currentStatus = old('status', $post?->status?->value ?? PostStatus::Draft->value);
+    $currentPublishedAt = old('published_at', $post?->published_at?->format('Y-m-d\TH:i'));
 
     $baseField = 'w-full rounded-2xl border bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition focus:ring-4';
     $okField = 'border-slate-200 focus:border-orange-300 focus:ring-orange-100';
@@ -116,6 +122,57 @@
         @error('excerpt')
             <p id="excerpt-error" class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>
         @enderror
+    </div>
+
+    <div>
+        <label class="mb-2 block text-sm font-semibold text-slate-700" for="status">Status</label>
+        <select
+            class="{{ $fieldClass('status') }}"
+            id="status"
+            name="status"
+        >
+            @foreach ($statuses as $status)
+                <option value="{{ $status->value }}" @selected($currentStatus === $status->value)>
+                    {{ $status->label() }}
+                </option>
+            @endforeach
+        </select>
+        @error('status')
+            <p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div>
+        <label class="mb-2 block text-sm font-semibold text-slate-700" for="published_at">
+            Publish at <span class="ml-1 text-xs font-normal text-slate-400">optional</span>
+        </label>
+        <input
+            class="{{ $fieldClass('published_at') }}"
+            id="published_at"
+            name="published_at"
+            type="datetime-local"
+            value="{{ $currentPublishedAt }}"
+        >
+        <p class="mt-1.5 text-xs text-slate-500">Set a future time to schedule publication.</p>
+        @error('published_at')
+            <p class="mt-2 text-sm font-medium text-rose-600">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="md:col-span-2">
+        <label class="mb-2 block text-sm font-semibold text-slate-700" for="tags">
+            Tags <span class="ml-1 text-xs font-normal text-slate-400">comma-separated</span>
+        </label>
+        <input
+            class="{{ $fieldClass('tag_ids') }}"
+            id="tags"
+            name="tags"
+            type="text"
+            value="{{ $currentTags }}"
+            placeholder="craft, notes, quiet rooms"
+            autocomplete="off"
+        >
+        <p class="mt-1.5 text-xs text-slate-500">New tags are created automatically.</p>
     </div>
 
     <div class="md:col-span-2">
