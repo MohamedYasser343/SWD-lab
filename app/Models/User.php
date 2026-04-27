@@ -44,6 +44,16 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;

@@ -11,6 +11,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TagController;
@@ -29,8 +30,8 @@ Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::resource('posts', PostController::class)->only(['index', 'show']);
 Route::resource('posts', PostController::class)->except(['index', 'show'])->middleware('auth');
+Route::resource('posts', PostController::class)->only(['index', 'show']);
 
 Route::get('/tags/{tag:slug}', [TagController::class, 'show'])->name('tags.show');
 Route::get('/authors/{user:username}', [AuthorController::class, 'show'])->name('authors.show');
@@ -56,6 +57,14 @@ Route::middleware(['auth', 'throttle:30,1'])->group(function () {
 Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])
     ->middleware('auth')
     ->name('comments.destroy');
+
+Route::middleware('auth')->prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'show'])->name('show');
+    Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+    Route::put('/', [ProfileController::class, 'update'])->name('update');
+    Route::get('/likes', [ProfileController::class, 'likes'])->name('likes');
+    Route::get('/bookmarks', [ProfileController::class, 'bookmarks'])->name('bookmarks');
+});
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', AdminDashboardController::class)->name('dashboard');

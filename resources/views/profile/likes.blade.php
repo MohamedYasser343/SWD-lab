@@ -1,0 +1,49 @@
+@extends('layouts.blog')
+
+@section('title', 'Liked posts')
+
+@section('content')
+    <section class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/75 p-8 shadow-[0_25px_80px_-45px_rgba(15,23,42,0.55)] backdrop-blur-xl">
+        <p class="mb-3 text-sm font-semibold uppercase tracking-[0.3em] text-orange-700">Profile</p>
+        <h1 class="font-display text-4xl font-semibold leading-tight text-slate-900">Posts you liked</h1>
+        <p class="mt-2 text-sm font-medium text-slate-500">
+            {{ $posts->total() }} {{ Str::plural('post', $posts->total()) }}
+        </p>
+    </section>
+
+    @if ($posts->isEmpty())
+        <section class="mt-8 rounded-[2rem] border border-dashed border-slate-300 bg-white/70 px-8 py-14 text-center shadow-sm">
+            <h2 class="font-display text-3xl font-semibold text-slate-900">You haven't liked any posts yet.</h2>
+            <p class="mt-3 text-sm text-slate-600">Browse <a href="{{ route('posts.index') }}" class="font-semibold text-orange-700 hover:underline">all posts</a> and tap the like button on the ones that resonate.</p>
+        </section>
+    @else
+        <section class="mt-8 grid gap-6 lg:grid-cols-2">
+            @foreach ($posts as $post)
+                <article class="group flex h-full flex-col rounded-[2rem] border border-white/80 bg-white/80 p-6 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.7)] transition hover:-translate-y-1">
+                    <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                        <span>
+                            @if ($post->category)
+                                <span class="rounded-full bg-orange-100 px-2.5 py-1 text-orange-800">{{ $post->category->name }}</span>
+                            @else
+                                Article
+                            @endif
+                        </span>
+                        <time>{{ optional($post->published_at ?? $post->created_at)->format('M d, Y') }}</time>
+                    </div>
+                    <h2 class="font-display mt-5 text-3xl font-semibold leading-tight text-slate-900">
+                        <a class="transition group-hover:text-orange-700" href="{{ route('posts.show', $post) }}">
+                            {{ $post->title }}
+                        </a>
+                    </h2>
+                    <p class="mt-4 flex-1 text-base leading-8 text-slate-600">{{ Str::limit($post->excerpt, 160) }}</p>
+                    <div class="mt-4 flex items-center justify-between text-xs text-slate-500">
+                        <span>by {{ $post->user?->name ?? 'unknown' }}</span>
+                        <span>{{ $post->reading_time }} min read</span>
+                    </div>
+                </article>
+            @endforeach
+        </section>
+
+        <div class="mt-8">{{ $posts->links() }}</div>
+    @endif
+@endsection

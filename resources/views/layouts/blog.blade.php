@@ -118,12 +118,23 @@
                         </button>
 
                         @auth
+                            @if (auth()->user()->canAccessAdmin())
+                                <a class="rounded-full border border-amber-300 bg-amber-50 px-4 py-2 font-semibold text-amber-800 transition hover:border-amber-400 hover:bg-amber-100" href="{{ route('admin.dashboard') }}">
+                                    Admin
+                                </a>
+                            @endif
                             <a class="rounded-full border border-slate-200/80 px-4 py-2 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700" href="{{ route('posts.create') }}">
                                 Write Post
                             </a>
-                            <span class="px-2 text-xs font-semibold uppercase tracking-widest text-slate-400">
+                            <a class="rounded-full border border-slate-200/80 px-4 py-2 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700" href="{{ route('profile.bookmarks') }}">
+                                Bookmarks
+                            </a>
+                            <a class="rounded-full border border-slate-200/80 px-4 py-2 transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700" href="{{ route('profile.likes') }}">
+                                Likes
+                            </a>
+                            <a class="rounded-full px-2 text-xs font-semibold uppercase tracking-widest text-slate-400 transition hover:text-orange-700" href="{{ route('profile.show') }}">
                                 {{ auth()->user()->name }}
-                            </span>
+                            </a>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="rounded-full border border-rose-200 px-4 py-2 text-rose-700 transition hover:border-rose-300 hover:bg-rose-50">
